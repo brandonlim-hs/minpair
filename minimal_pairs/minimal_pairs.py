@@ -1,18 +1,24 @@
 from collections import defaultdict
 from minimal_pairs import arpabet
 from nltk import download as nltk_download
+from nltk.corpus import brown
 from nltk.corpus import cmudict
 from nltk.corpus import words
 import re
 
 
-def vowel_minimal_pairs(vowels: list):
+def vowel_minimal_pairs(vowels: list, pos: list = ['ADJ', 'NOUN', 'VERB']):
     """Find words that differ in only the vowel phonological element, for the given vowel arpabets.
 
     For example, ['bad', 'bed', 'bid'] are one of the vowel minimal pairs for ['AE', 'EH', 'IH'] vowels.
 
+    By default, return words that adjective, noun or verb.
+
     Arguments:
         vowels {list} -- The given vowel arpabets. For example, ['AE', 'EH'].
+
+    Keyword Arguments:
+        pos {list} -- The list of parts of speech from universal tagset. (default: {['ADJ', 'NOUN', 'VERB']}).
 
     Raises:
         Exception: If less than two unique vowel arpabets is given.
@@ -28,9 +34,14 @@ def vowel_minimal_pairs(vowels: list):
         raise Exception('Only vowels are accepted.')
     possible_pairs = defaultdict(lambda: {})
     vowels_regex = re.compile(r'^(?:%s)' % '|'.join(vowels))
-    nltk_download('words')
+    nltk_download('brown')
     nltk_download('cmudict')
-    english_words = set(words.words())
+    nltk_download('universal_tagset')
+    nltk_download('words')
+    tagged_words = {word
+                    for word, tag in brown.tagged_words(tagset='universal')
+                    if tag in pos}
+    english_words = set(words.words()).intersection(tagged_words)
     cmudict_entries = [(word, phones)
                        for word, phones in cmudict.entries()
                        if word in english_words
