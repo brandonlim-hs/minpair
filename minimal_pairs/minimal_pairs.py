@@ -2,6 +2,7 @@ from collections import defaultdict
 from minimal_pairs import arpabet
 from nltk import download as nltk_download
 from nltk.corpus import cmudict
+from nltk.corpus import words
 import re
 
 
@@ -27,16 +28,21 @@ def vowel_minimal_pairs(vowels: list):
         raise Exception('Only vowels are accepted.')
     possible_pairs = defaultdict(lambda: {})
     vowels_regex = re.compile(r'^(?:%s)' % '|'.join(vowels))
+    nltk_download('words')
     nltk_download('cmudict')
-    for word, phones in cmudict.entries():
-        if syllable_count(phones) == 1:
-            matches = [vowels_regex.search(phone) for phone in phones]
-            indices = [(i, match.group(0))
-                       for i, match in enumerate(matches) if match != None]
-            for index, matched_vowel in indices:
-                key = tuple(phone if i != index else '.'
-                            for i, phone in enumerate(phones))
-                possible_pairs[key][matched_vowel] = word
+    english_words = set(words.words())
+    cmudict_entries = [(word, phones)
+                       for word, phones in cmudict.entries()
+                       if word in english_words
+                       if syllable_count(phones) == 1]
+    for word, phones in cmudict_entries:
+        matches = [vowels_regex.search(phone) for phone in phones]
+        indices = [(i, match.group(0))
+                   for i, match in enumerate(matches) if match != None]
+        for index, matched_vowel in indices:
+            key = tuple(phone if i != index else '.'
+                        for i, phone in enumerate(phones))
+            possible_pairs[key][matched_vowel] = word
     return [list(matched_vowel.values())
             for (k, matched_vowel) in possible_pairs.items()
             if set(matched_vowel) == vowels]
