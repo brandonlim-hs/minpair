@@ -1,0 +1,53 @@
+# Python package
+# Create and test a Python package on multiple Python versions.
+# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+
+trigger:
+- master
+
+variables:
+  NLTK_DATA: $(Pipeline.Workspace)/.nltk
+
+jobs:
+- job: TestSupportedPythonVersions
+  displayName: 'Test across supported Python versions'
+  pool:
+    vmImage: 'ubuntu-latest'
+  strategy:
+    matrix:
+      Python3:
+        python.version: '3'
+      Python35:
+        python.version: '3.5'
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+    maxParallel: 4
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+    displayName: 'Use Python $(python.version)'
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install -r requirements.txt
+      pip install -r test_requirements.txt
+    displayName: 'Install dependencies'
+  - task: CacheBeta@0
+    inputs:
+      key: nltk | brown | cmudict | universal_tagset | words
+      path: $(NLTK_DATA)
+      cacheHitVar: NLTK_CACHE_HIT
+    displayName: 'Cache NLTK data'
+  - script: |
+      python -m nltk.downloader -d $(NLTK_DATA) brown
+      python -m nltk.downloader -d $(NLTK_DATA) cmudict
+      python -m nltk.downloader -d $(NLTK_DATA) universal_tagset
+      python -m nltk.downloader -d $(NLTK_DATA) words
+    condition: ne(variables.NLTK_CACHE_HIT, 'true')
+    displayName: 'Download NLTK data'
+  - script: |
+      python setup.py test
+    displayName: 'Test'
