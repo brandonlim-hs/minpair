@@ -88,5 +88,5 @@ jobs:
       displayName: 'Twine Authenticate'
     - script: |
         python -m pip install --upgrade twine
-        python -m twine upload dist/*.whl
+        python -m twine upload --config-file $(PYPIRC_PATH) dist/*.whl
       displayName: 'Publish to PyPI'
