@@ -31,27 +31,27 @@ jobs:
     maxParallel: 4
   steps:
   - task: UsePythonVersion@0
+    displayName: 'Use Python $(python.version)'
     inputs:
       versionSpec: '$(python.version)'
-    displayName: 'Use Python $(python.version)'
   - script: |
       python -m pip install --upgrade pip setuptools
       pip install -r requirements.txt
       pip install -r test_requirements.txt
     displayName: 'Install dependencies'
   - task: CacheBeta@0
+    displayName: 'Cache NLTK data'
     inputs:
       key: nltk | brown | cmudict | universal_tagset | words
       path: $(NLTK_DATA)
       cacheHitVar: NLTK_CACHE_HIT
-    displayName: 'Cache NLTK data'
   - script: |
       python -m nltk.downloader -d $(NLTK_DATA) brown
       python -m nltk.downloader -d $(NLTK_DATA) cmudict
       python -m nltk.downloader -d $(NLTK_DATA) universal_tagset
       python -m nltk.downloader -d $(NLTK_DATA) words
-    condition: ne(variables.NLTK_CACHE_HIT, 'true')
     displayName: 'Download NLTK data'
+    condition: ne(variables.NLTK_CACHE_HIT, 'true')
   - script: |
       python setup.py test
     displayName: 'Test'
@@ -70,34 +70,30 @@ jobs:
     inputs:
       targetPath: '$(Pipeline.Workspace)/dist'
       artifact: 'dist'
-- deployment: PublishToPyPI
+- job: PublishToPyPI
+  displayName: 'Publish to PyPI'
   dependsOn: TestSupportedPythonVersions
 #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-  displayName: 'Publish to PyPI'
   pool:
     vmImage: 'ubuntu-latest'
-  environment: 'pypi'
-  strategy:
-    runOnce:
-      deploy:
-        steps:
-        - task: UsePythonVersion@0
-          inputs:
-            versionSpec: '3.x'
-          displayName: 'Use Python 3.x'
-        - task: DownloadPipelineArtifact@2
-          inputs:
-            buildType: 'current'
-            artifact: 'dist'
-        - script: |
-            python -m pip install --upgrade setuptools wheel
-            python setup.py sdist bdist_wheel
-          displayName: 'Generate distribution archives'
-        - task: TwineAuthenticate@1
-          inputs:
-            pythonUploadServiceConnection: 'pypi-minimal-pairs'
-          displayName: 'Twine Authenticate'
-        - script: |
-            python -m pip install --upgrade twine
-            python -m twine upload dist/*.whl
-          displayName: 'Publish to PyPI'
+  steps:
+    - task: UsePythonVersion@0
+      inputs:
+        versionSpec: '3.x'
+      displayName: 'Use Python 3.x'
+    - task: DownloadPipelineArtifact@2
+      inputs:
+        buildType: 'current'
+        artifact: 'dist'
+    - script: |
+        python -m pip install --upgrade setuptools wheel
+        python setup.py sdist bdist_wheel
+      displayName: 'Generate distribution archives'
+    - task: TwineAuthenticate@1
+      inputs:
+        pythonUploadServiceConnection: 'pypi-minimal-pairs'
+      displayName: 'Twine Authenticate'
+    - script: |
+        python -m pip install --upgrade twine
+        python -m twine upload dist/*.whl
+      displayName: 'Publish to PyPI'
