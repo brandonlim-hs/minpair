@@ -25,7 +25,7 @@ def vowel_minimal_pairs(vowels: list, pos: list = ['ADJ', 'NOUN', 'VERB']):
         Exception: If non-vowel arpabet is given.
 
     Returns:
-        list -- A list of minimal pairs (words that differ in only vowel sound).
+        list -- A list of dictionaries. Each dictionary maps vowels to words.
     """
     vowels = {arpabet.destress(vowel.upper()) for vowel in vowels}
     if len(vowels) < 2:
@@ -54,7 +54,7 @@ def vowel_minimal_pairs(vowels: list, pos: list = ['ADJ', 'NOUN', 'VERB']):
             key = tuple(phone if i != index else '.'
                         for i, phone in enumerate(phones))
             possible_pairs[key][matched_vowel] = word
-    return [list(matched_vowel.values())
+    return [matched_vowel
             for (k, matched_vowel) in possible_pairs.items()
             if set(matched_vowel) == vowels]
 

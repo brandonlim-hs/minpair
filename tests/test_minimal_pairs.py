@@ -12,5 +12,5 @@ class TestArpabet(unittest.TestCase):
             minimal_pairs.vowel_minimal_pairs(['AE', 'B'])
 
     def test_vowel_minimal_pairs_returns_word_for_each_vowel(self):
-        self.assertIn(['bad', 'bed', 'bid'],
+        self.assertIn({'AE': 'bad', 'EH': 'bed', 'IH': 'bid'},
                       minimal_pairs.vowel_minimal_pairs(['AE', 'EH', 'IH']))
