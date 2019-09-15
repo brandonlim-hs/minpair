@@ -72,6 +72,7 @@ jobs:
   displayName: 'Publish to PyPI'
   pool:
     vmImage: 'ubuntu-latest'
+  environment: 'pypi'
   strategy:
     runOnce:
       deploy:
