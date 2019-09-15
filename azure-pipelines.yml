@@ -82,11 +82,7 @@ jobs:
         python setup.py sdist bdist_wheel
         for f in dist/*.whl; do mv "$f" "`echo $f | sed "s/0.1.0/0.1.dev2/g"`"; done
       displayName: 'Generate distribution archives'
-    - task: TwineAuthenticate@1
-      inputs:
-        pythonUploadServiceConnection: 'pypi-minimal-pairs'
-      displayName: 'Twine Authenticate'
     - script: |
+        echo $(TWINE_USERNAME)
         python -m pip install --upgrade twine
-        python -m twine upload --config-file $(PYPIRC_PATH) dist/*.whl
       displayName: 'Publish to PyPI'
