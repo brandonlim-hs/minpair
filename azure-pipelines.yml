@@ -66,6 +66,10 @@ jobs:
     inputs:
       codeCoverageTool: Cobertura
       summaryFileLocation: 'coverage.xml'
+  - task: PublishPipelineArtifact@1
+    inputs:
+      targetPath: '$(Pipeline.Workspace)/dist'
+      artifact: 'dist'
 - deployment: PublishToPyPI
   dependsOn: TestSupportedPythonVersions
 #   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
@@ -81,6 +85,10 @@ jobs:
           inputs:
             versionSpec: '3.x'
           displayName: 'Use Python 3.x'
+        - task: DownloadPipelineArtifact@2
+          inputs:
+            buildType: 'current'
+            artifact: 'dist'
         - script: |
             python -m pip install --upgrade setuptools wheel
             python setup.py sdist bdist_wheel
