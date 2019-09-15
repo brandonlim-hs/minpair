@@ -21,7 +21,7 @@ jobs:
   strategy:
     matrix:
       Python3:
-        python.version: '2'
+        python.version: '3'
       Python35:
         python.version: '3.5'
       Python36:
