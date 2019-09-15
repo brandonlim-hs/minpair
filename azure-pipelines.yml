@@ -5,6 +5,10 @@
 
 trigger:
 - master
+- releases/*
+pr:
+- master
+- releases/*
 
 variables:
   NLTK_DATA: $(Pipeline.Workspace)/.nltk
@@ -51,3 +55,22 @@ jobs:
   - script: |
       python setup.py test
     displayName: 'Test'
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'XUnit'
+      testResultsFiles: 'nosetests.xml'
+      mergeTestResults: true
+      failTaskOnFailedTests: true
+      testRunTitle: 'Publish test results for Python $(python.version)'
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: 'coverage.xml'
+- job: Next
+  displayName: 'Next'
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+  - script: |
+      echo 'Hello'
+    displayName: 'Say Hello'
