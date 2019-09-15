@@ -82,12 +82,9 @@ jobs:
         python setup.py sdist bdist_wheel
         for f in dist/*.whl; do mv "$f" "`echo $f | sed "s/0.1.0/0.1.dev2/g"`"; done
       displayName: 'Generate distribution archives'
-    - task: TwineAuthenticate@1
-      displayName: 'Twine Authenticate'
-      inputs:
-        pythonUploadServiceConnection: 'pypi-minimal-pairs'
+    - bash: echo $(TWINE_USERNAME)
       # Use command line script to 'twine upload', use -r to pass the repository name and --config-file to pass the environment variable set by the authenticate task.
     - script: |
         python -m twine -h
-        # python -m twine upload --config-file $(PYPIRC_PATH) dist/*.whl
+        python -m twine upload dist/*.whl -u A -p B
       displayName: 'Publish to PyPI'
