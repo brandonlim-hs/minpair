@@ -86,5 +86,5 @@ jobs:
       # Use command line script to 'twine upload', use -r to pass the repository name and --config-file to pass the environment variable set by the authenticate task.
     - script: |
         python -m twine -h
-        python -m twine upload dist/*.whl
+        python -m twine upload dist/*.whl -u $(TWINE_USERNAME) -p $(TWINE_PASSWORD)
       displayName: 'Publish to PyPI'
