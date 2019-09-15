@@ -12,6 +12,8 @@ pr:
 
 variables:
   NLTK_DATA: $(Pipeline.Workspace)/.nltk
+  TWINE_USERNAME: $(TWINE_USERNAME)
+  TWINE_PASSWORD: $(TWINE_PASSWORD)
 
 jobs:
 # - job: TestSupportedPythonVersions
@@ -83,8 +85,6 @@ jobs:
         for f in dist/*.whl; do mv "$f" "`echo $f | sed "s/0.1.0/0.1.dev2/g"`"; done
       displayName: 'Generate distribution archives'
     - script: |
-        echo $env:TWINE_USERNAME
         python -m pip install --upgrade twine
+        python -m twine upload dist/*.whl
       displayName: 'Publish to PyPI'
-      env:
-        TWINE_USERNAME: $(TWINE_USERNAME)
