@@ -83,6 +83,8 @@ jobs:
         for f in dist/*.whl; do mv "$f" "`echo $f | sed "s/0.1.0/0.1.dev2/g"`"; done
       displayName: 'Generate distribution archives'
     - script: |
-        echo $(TWINE_USERNAME)
+        echo $env:TWINE_USERNAME
         python -m pip install --upgrade twine
       displayName: 'Publish to PyPI'
+      env:
+        TWINE_USERNAME: $(TWINE_USERNAME)
