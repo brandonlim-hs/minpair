@@ -88,5 +88,6 @@ jobs:
         pythonUploadServiceConnection: 'pypi-minimal-pairs'
       # Use command line script to 'twine upload', use -r to pass the repository name and --config-file to pass the environment variable set by the authenticate task.
     - script: |
-        python -m twine upload --config-file $(PYPIRC_PATH) dist/*.whl
+        python -m twine -h
+        # python -m twine upload --config-file $(PYPIRC_PATH) dist/*.whl
       displayName: 'Publish to PyPI'
