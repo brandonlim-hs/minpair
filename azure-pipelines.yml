@@ -12,8 +12,6 @@ pr:
 
 variables:
   NLTK_DATA: $(Pipeline.Workspace)/.nltk
-  TWINE_USERNAME: $(TWINE_USERNAME)
-  TWINE_PASSWORD: $(TWINE_PASSWORD)
 
 jobs:
 # - job: TestSupportedPythonVersions
@@ -86,5 +84,5 @@ jobs:
       displayName: 'Generate distribution archives'
     - script: |
         python -m pip install --upgrade twine
-        python -m twine upload dist/*.whl
+        python -m twine upload dist/*.whl --verbose
       displayName: 'Publish to PyPI'
