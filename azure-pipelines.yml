@@ -66,12 +66,29 @@ jobs:
     inputs:
       codeCoverageTool: Cobertura
       summaryFileLocation: 'coverage.xml'
-- job: Next
-  displayName: 'Next'
+- deployment: PublishToPyPI
   dependsOn: TestSupportedPythonVersions
+#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  displayName: 'Publish to PyPI'
   pool:
     vmImage: 'ubuntu-latest'
-  steps:
-  - script: |
-      echo 'Hello'
-    displayName: 'Say Hello'
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        - task: UsePythonVersion@0
+          inputs:
+            versionSpec: '3.x'
+          displayName: 'Use Python 3.x'
+        - script: |
+            python -m pip install --upgrade setuptools wheel
+            python setup.py sdist bdist_wheel
+          displayName: 'Generate distribution archives'
+        - task: TwineAuthenticate@1
+          inputs:
+            pythonUploadServiceConnection: 'pypi-minimal-pairs'
+          displayName: 'Twine Authenticate'
+        - script: |
+            python -m pip install --upgrade twine
+            python -m twine upload dist/*.whl
+          displayName: 'Publish to PyPI'
