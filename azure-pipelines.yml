@@ -74,15 +74,19 @@ jobs:
     vmImage: 'ubuntu-latest'
   steps:
     - task: UsePythonVersion@0
+      displayName: 'Use Python 3.x'
       inputs:
         versionSpec: '3.x'
-      displayName: 'Use Python 3.x'
     - script: |
-        python -m pip install --upgrade setuptools wheel
+        python -m pip install --upgrade setuptools twine wheel
         python setup.py sdist bdist_wheel
         for f in dist/*.whl; do mv "$f" "`echo $f | sed "s/0.1.0/0.1.dev2/g"`"; done
       displayName: 'Generate distribution archives'
+    - task: TwineAuthenticate@1
+      displayName: 'Twine Authenticate'
+      inputs:
+        pythonUploadServiceConnection: 'pypi-minimal-pairs'
+      # Use command line script to 'twine upload', use -r to pass the repository name and --config-file to pass the environment variable set by the authenticate task.
     - script: |
-        python -m pip install --upgrade twine
-        python -m twine upload dist/*.whl --verbose
+        python -m twine upload --config-file $(PYPIRC_PATH) dist/*.whl
       displayName: 'Publish to PyPI'
