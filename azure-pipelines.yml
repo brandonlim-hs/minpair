@@ -68,6 +68,7 @@ jobs:
       summaryFileLocation: 'coverage.xml'
 - job: Next
   displayName: 'Next'
+  dependsOn: TestSupportedPythonVersions
   pool:
     vmImage: 'ubuntu-latest'
   steps:
