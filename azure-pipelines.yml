@@ -4,87 +4,63 @@
 # https://docs.microsoft.com/azure/devops/pipelines/languages/python
 
 trigger:
-- master
-- releases/*
-pr:
-- master
-- releases/*
+  branches:
+    include:
+    - master
 
 variables:
   NLTK_DATA: $(Pipeline.Workspace)/.nltk
 
 jobs:
-# - job: TestSupportedPythonVersions
-#   displayName: 'Test across supported Python versions'
-#   pool:
-#     vmImage: 'ubuntu-latest'
-#   strategy:
-#     matrix:
-#       Python3:
-#         python.version: '3'
-#       Python35:
-#         python.version: '3.5'
-#       Python36:
-#         python.version: '3.6'
-#       Python37:
-#         python.version: '3.7'
-#     maxParallel: 4
-#   steps:
-#   - task: UsePythonVersion@0
-#     displayName: 'Use Python $(python.version)'
-#     inputs:
-#       versionSpec: '$(python.version)'
-#   - script: |
-#       python -m pip install --upgrade pip setuptools
-#       pip install -r requirements.txt
-#       pip install -r test_requirements.txt
-#     displayName: 'Install dependencies'
-#   - task: CacheBeta@0
-#     displayName: 'Cache NLTK data'
-#     inputs:
-#       key: nltk | brown | cmudict | universal_tagset | words
-#       path: $(NLTK_DATA)
-#       cacheHitVar: NLTK_CACHE_HIT
-#   - script: |
-#       python -m nltk.downloader -d $(NLTK_DATA) brown
-#       python -m nltk.downloader -d $(NLTK_DATA) cmudict
-#       python -m nltk.downloader -d $(NLTK_DATA) universal_tagset
-#       python -m nltk.downloader -d $(NLTK_DATA) words
-#     displayName: 'Download NLTK data'
-#     condition: ne(variables.NLTK_CACHE_HIT, 'true')
-#   - script: |
-#       python setup.py test
-#     displayName: 'Test'
-#   - task: PublishTestResults@2
-#     inputs:
-#       testResultsFormat: 'XUnit'
-#       testResultsFiles: 'nosetests.xml'
-#       mergeTestResults: true
-#       failTaskOnFailedTests: true
-#       testRunTitle: 'Publish test results for Python $(python.version)'
-#   - task: PublishCodeCoverageResults@1
-#     inputs:
-#       codeCoverageTool: Cobertura
-#       summaryFileLocation: 'coverage.xml'
-- job: PublishToPyPI
-  displayName: 'Publish to PyPI'
-  # dependsOn: TestSupportedPythonVersions
-#   condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+- job: TestSupportedPythonVersions
+  displayName: 'Test across supported Python versions'
   pool:
     vmImage: 'ubuntu-latest'
+  strategy:
+    matrix:
+      Python3:
+        python.version: '3'
+      Python35:
+        python.version: '3.5'
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+    maxParallel: 4
   steps:
-    - task: UsePythonVersion@0
-      displayName: 'Use Python 3.x'
-      inputs:
-        versionSpec: '3.x'
-    - script: |
-        python -m pip install --upgrade setuptools twine wheel
-        python setup.py sdist bdist_wheel
-        for f in dist/*.whl; do mv "$f" "`echo $f | sed "s/0.1.0/0.1.dev2/g"`"; done
-      displayName: 'Generate distribution archives'
-    - bash: echo $(TWINE_USERNAME)
-      # Use command line script to 'twine upload', use -r to pass the repository name and --config-file to pass the environment variable set by the authenticate task.
-    - script: |
-        python -m twine -h
-        python -m twine upload dist/*.whl -u $(TWINE_USERNAME) -p $(TWINE_PASSWORD)
-      displayName: 'Publish to PyPI'
+  - task: UsePythonVersion@0
+    displayName: 'Use Python $(python.version)'
+    inputs:
+      versionSpec: '$(python.version)'
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install -r requirements.txt
+      pip install -r test_requirements.txt
+    displayName: 'Install dependencies'
+  - task: CacheBeta@0
+    displayName: 'Cache NLTK data'
+    inputs:
+      key: nltk | brown | cmudict | universal_tagset | words
+      path: $(NLTK_DATA)
+      cacheHitVar: NLTK_CACHE_HIT
+  - script: |
+      python -m nltk.downloader -d $(NLTK_DATA) brown
+      python -m nltk.downloader -d $(NLTK_DATA) cmudict
+      python -m nltk.downloader -d $(NLTK_DATA) universal_tagset
+      python -m nltk.downloader -d $(NLTK_DATA) words
+    displayName: 'Download NLTK data'
+    condition: ne(variables.NLTK_CACHE_HIT, 'true')
+  - script: |
+      python setup.py test
+    displayName: 'Test'
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'XUnit'
+      testResultsFiles: 'nosetests.xml'
+      mergeTestResults: true
+      failTaskOnFailedTests: true
+      testRunTitle: 'Publish test results for Python $(python.version)'
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: 'coverage.xml'
