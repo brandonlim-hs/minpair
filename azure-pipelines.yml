@@ -7,6 +7,9 @@ trigger:
   branches:
     include:
     - master
+  tags:
+    include:
+    - '*'
 
 variables:
   NLTK_DATA: $(Pipeline.Workspace)/.nltk
@@ -52,16 +55,35 @@ jobs:
     condition: ne(variables.NLTK_CACHE_HIT, 'true')
   - script: |
       pytest
-    displayName: "Test with pytest"
+    displayName: 'Test with pytest'
   - task: PublishTestResults@2
     condition: succeededOrFailed()
     inputs:
-      testResultsFiles: "junit/test-results.xml"
+      testResultsFiles: 'junit/test-results.xml'
       mergeTestResults: true
       failTaskOnFailedTests: true
-      testRunTitle: "Publish test results for Python $(python.version)"
+      testRunTitle: 'Publish test results for Python $(python.version)'
   - task: PublishCodeCoverageResults@1
     inputs:
       codeCoverageTool: Cobertura
-      summaryFileLocation: "coverage.xml"
-      reportDirectory: "htmlcov"
+      summaryFileLocation: 'coverage.xml'
+      reportDirectory: 'htmlcov'
+- job: PublishToPyPI
+  displayName: 'Publish to PyPI'
+  dependsOn: TestSupportedPythonVersions
+  condition: and(succeeded(), startsWith(variables['Build.SourceBranch'], 'refs/tags/'))
+  pool:
+    vmImage: 'ubuntu-latest'
+  steps:
+    - task: UsePythonVersion@0
+      displayName: 'Use Python 3.x'
+      inputs:
+        versionSpec: '3.x'
+    - script: |
+        python -m pip install --upgrade setuptools twine wheel
+        pip install -r requirements.txt
+        python setup.py sdist bdist_wheel
+      displayName: 'Generate distribution archives'
+    - script: |
+        python -m twine upload dist/*.whl -u $(TWINE_USERNAME) -p $(TWINE_PASSWORD)
+      displayName: 'Publish to PyPI'
