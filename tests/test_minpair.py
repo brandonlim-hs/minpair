@@ -1,4 +1,4 @@
-from minpair import minpair
+import minpair
 import pytest
 
 

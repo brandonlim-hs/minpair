@@ -1,5 +1,5 @@
+from . import arpabet
 from collections import defaultdict
-from minpair import arpabet
 from nltk import download as nltk_download
 from nltk.corpus import brown
 from nltk.corpus import cmudict
