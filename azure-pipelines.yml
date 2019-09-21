@@ -51,16 +51,17 @@ jobs:
     displayName: 'Download NLTK data'
     condition: ne(variables.NLTK_CACHE_HIT, 'true')
   - script: |
-      python setup.py test
-    displayName: 'Test'
+      pytest
+    displayName: "Test with pytest"
   - task: PublishTestResults@2
+    condition: succeededOrFailed()
     inputs:
-      testResultsFormat: 'XUnit'
-      testResultsFiles: 'nosetests.xml'
+      testResultsFiles: "junit/test-results.xml"
       mergeTestResults: true
       failTaskOnFailedTests: true
-      testRunTitle: 'Publish test results for Python $(python.version)'
+      testRunTitle: "Publish test results for Python $(python.version)"
   - task: PublishCodeCoverageResults@1
     inputs:
       codeCoverageTool: Cobertura
-      summaryFileLocation: 'coverage.xml'
+      summaryFileLocation: "coverage.xml"
+      reportDirectory: "htmlcov"
