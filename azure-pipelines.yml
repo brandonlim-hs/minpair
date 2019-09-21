@@ -1,0 +1,66 @@
+# Python package
+# Create and test a Python package on multiple Python versions.
+# Add steps that analyze code, save the dist with the build record, publish to a PyPI-compatible index, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/languages/python
+
+trigger:
+  branches:
+    include:
+    - master
+
+variables:
+  NLTK_DATA: $(Pipeline.Workspace)/.nltk
+
+jobs:
+- job: TestSupportedPythonVersions
+  displayName: 'Test across supported Python versions'
+  pool:
+    vmImage: 'ubuntu-latest'
+  strategy:
+    matrix:
+      Python3:
+        python.version: '3'
+      Python35:
+        python.version: '3.5'
+      Python36:
+        python.version: '3.6'
+      Python37:
+        python.version: '3.7'
+    maxParallel: 4
+  steps:
+  - task: UsePythonVersion@0
+    displayName: 'Use Python $(python.version)'
+    inputs:
+      versionSpec: '$(python.version)'
+  - script: |
+      python -m pip install --upgrade pip setuptools
+      pip install -r requirements.txt
+      pip install -r test_requirements.txt
+    displayName: 'Install dependencies'
+  - task: CacheBeta@0
+    displayName: 'Cache NLTK data'
+    inputs:
+      key: nltk | brown | cmudict | universal_tagset | words
+      path: $(NLTK_DATA)
+      cacheHitVar: NLTK_CACHE_HIT
+  - script: |
+      python -m nltk.downloader -d $(NLTK_DATA) brown
+      python -m nltk.downloader -d $(NLTK_DATA) cmudict
+      python -m nltk.downloader -d $(NLTK_DATA) universal_tagset
+      python -m nltk.downloader -d $(NLTK_DATA) words
+    displayName: 'Download NLTK data'
+    condition: ne(variables.NLTK_CACHE_HIT, 'true')
+  - script: |
+      python setup.py test
+    displayName: 'Test'
+  - task: PublishTestResults@2
+    inputs:
+      testResultsFormat: 'XUnit'
+      testResultsFiles: 'nosetests.xml'
+      mergeTestResults: true
+      failTaskOnFailedTests: true
+      testRunTitle: 'Publish test results for Python $(python.version)'
+  - task: PublishCodeCoverageResults@1
+    inputs:
+      codeCoverageTool: Cobertura
+      summaryFileLocation: 'coverage.xml'
