@@ -1,7 +1,7 @@
 import os
 from setuptools import find_packages, setup
 from io import open
-from minimal_pairs import __version__
+from minpair import __version__
 
 with open("README.md") as readme_file:
     long_description = readme_file.read()
@@ -13,14 +13,14 @@ with open(os.path.join(os.path.dirname(__file__), 'test_requirements.txt')) as f
     tests_require = f.read().splitlines()
 
 setup(
-    name="minimal_pairs",
+    name="minpair",
     version=__version__,
     author="Brandon Lim",
     author_email="brandonlim.lim@gmail.com",
-    description="Generate minimal pairs",
+    description="Generate minimal pairs (and minimal sets).",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/brandonlim-hs/minimal-pairs",
+    url="https://github.com/brandonlim-hs/minpair",
     packages=find_packages(),
     license="MIT License",
     classifiers=[

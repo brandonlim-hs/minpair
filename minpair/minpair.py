@@ -1,5 +1,5 @@
 from collections import defaultdict
-from minimal_pairs import arpabet
+from minpair import arpabet
 from nltk import download as nltk_download
 from nltk.corpus import brown
 from nltk.corpus import cmudict
@@ -7,7 +7,7 @@ from nltk.corpus import words
 import re
 
 
-def vowel_minimal_pairs(vowels: list, pos: list = ['ADJ', 'NOUN', 'VERB']):
+def vowel_minpair(vowels: list, pos: list = ['ADJ', 'NOUN', 'VERB']):
     """Find words that differ in only the vowel phonological element, for the given vowel arpabets.
 
     For example, ['bad', 'bed', 'bid'] are one of the vowel minimal pairs for ['AE', 'EH', 'IH'] vowels.

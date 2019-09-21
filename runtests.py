@@ -13,7 +13,7 @@ def start(argv=None):
     if argv is None:
         argv = [
             "nosetests", "--verbose", "--with-coverage",
-            "--cover-package=minimal_pairs", "--cover-erase",
+            "--cover-package=minpair", "--cover-erase",
             "--cover-branches", "--cover-xml", "--with-xunit",
         ]
 

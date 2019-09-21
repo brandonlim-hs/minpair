@@ -1,5 +1,5 @@
 import unittest
-from minimal_pairs import arpabet
+from minpair import arpabet
 
 
 class TestArpabet(unittest.TestCase):
