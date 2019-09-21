@@ -1,7 +1,7 @@
-import os
-from setuptools import find_packages, setup
 from io import open
 from minpair import __version__
+from setuptools import find_packages, setup
+import os
 
 with open("README.md") as readme_file:
     long_description = readme_file.read()
@@ -28,5 +28,8 @@ setup(
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3.7",
     ],
-    install_requires=install_requires
+    install_requires=install_requires,
+    use_scm_version={"version_scheme": "post-release",
+                     "write_to": "minpair/_version.py", },
+    setup_requires=["setuptools_scm"],
 )
