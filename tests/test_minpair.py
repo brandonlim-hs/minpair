@@ -8,7 +8,7 @@ def test_vowel_minpair_raises_exception_if_given_one_unique_vowel():
     assert 'At least a pair of unique vowels required.' in str(excinfo.value)
 
 
-def test_vowel_minpair_aises_exception_if_given_consonant():
+def test_vowel_minpair_raises_exception_if_given_consonant():
     with pytest.raises(Exception) as excinfo:
         minpair.vowel_minpair(['AE', 'B'])
     assert 'Only vowels are accepted.' in str(excinfo.value)
