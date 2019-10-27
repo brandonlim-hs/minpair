@@ -18,7 +18,7 @@ def vowel_minpair(vowels: list, pos: list = []):
         vowels {list} -- The given vowel arpabets. For example, ['AE', 'EH'].
 
     Keyword Arguments:
-        pos {list} -- The list of parts of speech from universal tagset. (default: {['ADJ', 'NOUN', 'VERB']}).
+        pos {list} -- The list of parts of speech from universal tagset. (default: {[]}).
 
     Raises:
         Exception: If less than two unique vowel arpabets is given.
