@@ -1,6 +1,6 @@
 from . import arpabet
+from .corpus import require as corpus_require
 from collections import defaultdict
-from nltk import download as nltk_download
 from nltk.corpus import brown
 from nltk.corpus import cmudict
 from nltk.corpus import words
@@ -32,12 +32,9 @@ def vowel_minpair(vowels: list, pos: list = []):
         raise Exception('At least a pair of unique vowels required.')
     if any(not arpabet.is_vowel(vowel) for vowel in vowels):
         raise Exception('Only vowels are accepted.')
+    corpus_require(['brown', 'cmudict', 'universal_tagset', 'words'])
     possible_pairs = defaultdict(lambda: {})
     vowels_regex = re.compile(r'^(?:%s)' % '|'.join(vowels))
-    nltk_download('brown')
-    nltk_download('cmudict')
-    nltk_download('universal_tagset')
-    nltk_download('words')
     pos = pos or ['ADJ', 'NOUN', 'VERB']
     tagged_words = {word
                     for word, tag in brown.tagged_words(tagset='universal')
