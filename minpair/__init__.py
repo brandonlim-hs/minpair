@@ -1,4 +1,13 @@
-from .minpair import *
+from .generator import Generator
+
+
+def generator(**args):
+    return Generator(**args)
+
+
+def vowel_minpair(vowels: list, pos: list = []):
+    return generator().vowel_minpair(vowels, pos)
+
 
 __all__ = ['__version__']
 try:
