@@ -12,8 +12,8 @@ class Generator(object):
     """
 
     def vowel_minpair(self, vowels: list, pos: list = []):
-        """Return words that differ in only one vowel phonological element,
-        for the given vowel arpabets.
+        """Return list of :class:`MinimalSet <MinimalSet>`, that differ in 
+        only one vowel phonological element.
 
         For example, ['bad', 'bed', 'bid'] are one of the vowel minimal sets
         for ['AE', 'EH', 'IH'] vowels.
@@ -32,7 +32,7 @@ class Generator(object):
             Exception: If non-vowel arpabet is given.
 
         Returns:
-            list -- A list of dictionaries. Each dictionary maps vowels to words.
+            list -- The list of :class:`MinimalSet <MinimalSet>`.
         """
         vowels = {arpabet.destress(vowel.upper()) for vowel in vowels}
         if len(vowels) < 2:
@@ -59,7 +59,7 @@ class Generator(object):
                 key = tuple(phone if i != index else '.'
                             for i, phone in enumerate(phones))
                 possible_pairs[key][matched_vowel] = word
-        return [matched_vowel
+        return [MinimalSet(matched_vowel)
                 for (k, matched_vowel) in possible_pairs.items()
                 if set(matched_vowel) == vowels]
 
@@ -77,3 +77,12 @@ class Generator(object):
             int -- The number of syllables.
         """
         return sum(arpabet.has_stress(phone) for phone in phones)
+
+
+class MinimalSet(dict):
+    """Dictionary of words that differ in only one phonological element.
+
+    Each key-value pair maps the differing phonological element to its 
+    associated word.
+    A minimal pair is a minimal set with only 2 entries.
+    """
