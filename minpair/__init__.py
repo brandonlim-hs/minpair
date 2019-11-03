@@ -5,8 +5,8 @@ def generator(**args):
     return Generator(**args)
 
 
-def vowel_minpair(vowels: list, pos: list = []):
-    return generator().vowel_minpair(vowels, pos)
+def vowel_minpair(vowels: list):
+    return generator().vowel_minpair(vowels)
 
 
 __all__ = ['__version__']

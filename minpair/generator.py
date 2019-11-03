@@ -11,21 +11,37 @@ class Generator(object):
     """Class to generate minimal pairs.
     """
 
-    def vowel_minpair(self, vowels: list, pos: list = []):
+    def __init__(self, pos: list = []):
+        """Init.
+
+        Keyword Arguments:
+            pos {list} -- Part-of-speech tags to filter words (default: {[]})
+        """
+        self.pos(pos)
+
+    def pos(self, pos: list = []):
+        """Set the part-of-speech tags to filter words.
+
+        If pos is empty, default to ['ADJ', 'NOUN', 'VERB']
+
+        Keyword Arguments:
+            pos {list} -- Part-of-speech tags to filter words (default: {[]})
+
+        Returns:
+            Generator -- Self
+        """
+        self.__pos = pos or ['ADJ', 'NOUN', 'VERB']
+        return self
+
+    def vowel_minpair(self, vowels: list):
         """Return list of :class:`MinimalSet <MinimalSet>`, that differ in 
         only one vowel phonological element.
 
         For example, ['bad', 'bed', 'bid'] are one of the vowel minimal sets
         for ['AE', 'EH', 'IH'] vowels.
 
-        By default, return words that adjective, noun or verb.
-
         Arguments:
             vowels {list} -- The vowel arpabets. For example, ['AE', 'EH'].
-
-        Keyword Arguments:
-            pos {list} -- The list of parts of speech from universal tagset.
-                (default: {[]}).
 
         Raises:
             Exception: If less than two unique vowel arpabets is given.
@@ -42,10 +58,9 @@ class Generator(object):
         corpus_require(['brown', 'cmudict', 'universal_tagset', 'words'])
         possible_pairs = defaultdict(lambda: {})
         vowels_regex = re.compile(r'^(?:%s)' % '|'.join(vowels))
-        pos = pos or ['ADJ', 'NOUN', 'VERB']
         tagged_words = {word
                         for word, tag in brown.tagged_words(tagset='universal')
-                        if tag in pos}
+                        if tag in self.__pos}
         english_words = set(words.words()).intersection(tagged_words)
         cmudict_entries = [(word, phones)
                            for word, phones in cmudict.entries()
