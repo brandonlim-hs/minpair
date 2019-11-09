@@ -1,4 +1,4 @@
-from .generator import Generator
+from minpair.generator import Generator
 
 
 def generator(**args):
@@ -11,7 +11,7 @@ def vowel_minpair(vowels: list):
 
 __all__ = ['__version__']
 try:
-    from ._version import version as __version__
+    from minpair._version import version as __version__
 except ImportError:
     # broken installation, we don't even try
     # unknown only works because we do poor mans version compare

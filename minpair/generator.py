@@ -1,6 +1,6 @@
-from . import arpabet
-from .corpus import require as corpus_require
 from collections import defaultdict
+from minpair import arpabet
+from minpair.corpus import require as corpus_require
 from nltk.corpus import brown
 from nltk.corpus import cmudict
 from nltk.corpus import words
