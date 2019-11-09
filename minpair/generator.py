@@ -11,13 +11,16 @@ class Generator(object):
     """Class to generate minimal pairs.
     """
 
-    def __init__(self, pos: list = []):
+    def __init__(self, download_corpus: bool = True, pos: list = []):
         """Init.
 
         Keyword Arguments:
+            download_corpus {bool} -- Flag to download corpus data if missing
+                (default: {True})
             pos {list} -- Part-of-speech tags to filter words (default: {[]})
         """
         self.pos(pos)
+        self.__download_corpus = download_corpus
 
     def pos(self, pos: list = []):
         """Set the part-of-speech tags to filter words.
@@ -32,6 +35,18 @@ class Generator(object):
         """
         self.__pos = pos or ['ADJ', 'NOUN', 'VERB']
         return self
+
+    def _corpus_require(self, corpora: list = []):
+        """Check corpus data requirements.
+
+        If configured to download corpus and the corpus data is missing, 
+        download the respective corpus data.
+
+        Keyword Arguments:
+            corpora {list} -- The identifier or name of corpus (default: {[]})
+        """
+        if self.__download_corpus:
+            corpus_require(corpora)
 
     def vowel_minpair(self, vowels: list):
         """Return list of :class:`MinimalSet <MinimalSet>`, that differ in 
@@ -55,7 +70,7 @@ class Generator(object):
             raise Exception('At least a pair of unique vowels required.')
         if any(not arpabet.is_vowel(vowel) for vowel in vowels):
             raise Exception('Only vowels are accepted.')
-        corpus_require(['brown', 'cmudict', 'universal_tagset', 'words'])
+        self._corpus_require(['brown', 'cmudict', 'universal_tagset', 'words'])
         possible_pairs = defaultdict(lambda: {})
         vowels_regex = re.compile(r'^(?:%s)' % '|'.join(vowels))
         tagged_words = {word
